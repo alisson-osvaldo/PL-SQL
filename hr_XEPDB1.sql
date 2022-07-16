@@ -29,12 +29,11 @@ NomeIdentificador [CONSTANT] TipoDeDado
 
 
 -------------------------------------------------------------------------------
-
 --SYSDATE : função que retorna a data atual
 SELECT sysdate
 FROM dual;
 
-
+SELECT TO_CHAR(sysdate, 'DD,MM,YYYY') FROM dual;
 
 ------------------------------------------------------------------------------
 --Bloco anonimo
@@ -49,16 +48,38 @@ BEGIN --Iniciar sessão executavel
     DBMS_OUTPUT.PUT_LINE('Média: ' || vMedia); -- ||Concatena
 END;
 
-
+--Delcarando variável do tipo CHAR e VARCHAR
 SET SERVEROUTPUT ON 
 DECLARE
+    vCaracterTamanhoFixo CHAR(4) := 'Olá';
     vTexto VARCHAR(100):= 'Seja bem vindo ao PL/SQL';
 BEGIN
-    DBMS_OUTPUT.PUT_LINE(vTexto);
+    DBMS_OUTPUT.PUT_LINE(vCaracterTamanhoFixo || Chr(10) || vTexto);
 EXCEPTION 
     WHEN OTHERS 
     THEN
     DBMS_OUTPUT.PUT_LINE('Erro Oracle: ' || SQLCODE || SQLERRM);
 END;
 
-----------------------------------------------------------------------------
+--Declarando variável do tipo Date
+SET SERVEROUTPUT ON
+DECLARE
+    vData1 DATE := '16/07/22';
+    vData2 DATE := '16/07/2022';
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('vData1: ' || vData1);
+    DBMS_OUTPUT.PUT_LINE('vData2: ' || vData2);   
+END;
+
+--Delcarando variáveis do tipo CONSTANTE
+DECLARE 
+    vConstante CONSTANT NUMBER(38,15) := 3.141592653589793;
+    vCaracterFixo CONSTANT CHAR(2) := 'PR';
+    vCaracterVariavel CONSTANT VARCHAR2(100) := 'Caracter variável';
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('vConstante: ' || vConstante);
+    DBMS_OUTPUT.PUT_LINE('vCaracterFixo: ' || vCaracterFixo);
+    DBMS_OUTPUT.PUT_LINE('vCaracterVariavel: ' || vCaracterVariavel);
+END;
+
+-----------------------------------------------------------------------------
