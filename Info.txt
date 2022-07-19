@@ -1,0 +1,62 @@
+
+DELIMITADORES:
+
++ 	Operador de adição
+:= 	Operador de atribuição
+=>	Operador de associação
+% 	Indicador de atributo
+' 	Delimitador de cadeia de caracteres
+. 	Indicador de componente
+|| 	Operador de concatenação
+/ 	Operador de divisão
+** 	Operador de exponenciação 
+(	Expressão ou delimitador de lista (começar)
+) 	Expressão ou delimitador de lista (final)
+: 	Indicador de variável do host
+, 	Separador de itens
+<< 	Delimitador de rótulo (início)
+>> 	Delimitador de rótulo (final)
+/* 	Delimitador de comentários de várias linhas (início)
+*/ 	Delimitador de comentários de várias linhas (final)
+* 	Operador de multiplicação
+" 	Delimitador de identificador entre aspas
+.. 	Operador de intervalo
+= 	Operador relacional (igual)
+<> 	Operador relacional (diferente)
+!= 	Operador relacional (diferente)
+~= 	Operador relacional (diferente)
+^= 	Operador relacional (diferente)
+< 	Operador relacional (menor que)
+> 	Operador relacional (maior que)
+<= 	Operador relacional (menor ou igual)
+>= 	Operador relacional (maior ou igual)
+@ 	Indicador de acesso remoto
+-- 	Indicador de comentário de linha única
+; 	Terminador de extrato
+- 	Operador de subtração ou negação
+
+-----------------------------------------------------------------------------------------------------------------------
+Convenções de Nomenclatura
+
+Variável    	: v
+Constante   	: c
+Cursor     	    : _cursor
+Exceção     	: e
+Tipo Record     : _record_tyep
+Variável Record : _record
+Parâmetro       : p
+Variável Global : g
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

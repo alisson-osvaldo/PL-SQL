@@ -182,8 +182,31 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('Numero Double = ' || vNumeroDouble);
 END;
 
+--Váriável BIND
+/*
+-São declaradas esternamentes ao bloco PL/SQL, não são declaradas na sesão DECLARE.
+-Utilizadas para passar valores em tempo de execução, para um ou mais blocos PL/SQL.
+*/
+SET SERVEROUTPUT ON
+    VARIABLE gMedia NUMBER
+DECLARE
+    vNumero1 NUMBER(11,2) := 2000;
+    vNumero2 NUMBER(11,2) := 5000;
+BEGIN
+    :gMedia := (vNumero1 + vNumero2) / 2;
+    DBMS_OUTPUT.PUT_LINE('Média: ' || TO_CHAR(:gMedia));
+EXCEPTION
+    WHEN OTHERS
+    THEN
+    DBMS_OUTPUT.PUT_LINE('ERRO Oralcle: ' || SQLCODE || SQLERRM);
+END;
 
 --(Funções)------------------------------------------------------------------------------------------------------------------------------
+/*
+Funções e expressões que não podemos utilizar no PL/SQl apenas em SQL:
+- DECODE
+- Funções de grupo: AVG,SUM, MIN, MAX, COUNT, STDDEV e VARIANCE.
+*/
 
 --SYSDATE : função que retorna a data atual
 SELECT sysdate
@@ -194,5 +217,23 @@ SELECT TO_CHAR(sysdate, 'DD,MM,YYYY') FROM dual;
 --DESC função que mostra a estrutura da tabela.
 DESC employees
 
-
 ------------------------------------------------------------------------------------------------------------------------------------
+-- Escopo de Identificadores e Blocos Aninhados
+
+SET SERVEROUTPUT ON
+<<BLOCO1>>
+DECLARE
+  vbloco1 VARCHAR2(20) := 'Bloco 1';
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Referenciando variável do Bloco 1: ' || bloco1.vbloco1);
+  -- Se voce referencia vbloco2 aqui ocorrerá Erro
+  <<BLOCO2>>
+  DECLARE
+    vbloco2 VARCHAR2(20) := 'Bloco 2';
+  BEGIN
+    DBMS_OUTPUT.PUT_LINE('Referenciando variável do Bloco 1: ' || bloco1.vbloco1);
+    DBMS_OUTPUT.PUT_LINE('Referenciando variável do Bloco 2: ' || bloco2.vbloco2);
+  END;
+  DBMS_OUTPUT.PUT_LINE('Referenciando variável do Bloco 1: ' || bloco1.vbloco1);
+  -- Se voce referencia vbloco2 aqui ocorrerá Erro
+END;
