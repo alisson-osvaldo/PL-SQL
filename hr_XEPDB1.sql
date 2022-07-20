@@ -237,3 +237,111 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('Referenciando variável do Bloco 1: ' || bloco1.vbloco1);
   -- Se voce referencia vbloco2 aqui ocorrerá Erro
 END;
+
+------------------------------------------------------------------------------------------------------------------------------------
+-- Comandos SQL no PL/SQL
+/*
+    SELECT:
+    - Deve retornar apenas uma linha.
+    - Caso retorne mais de um gera exceção TOO_MANY_ROWS.
+    - Caso não retorne nenhuma linha gera execeção NO_DATA_FOUND.
+    - Você deve garantir que o comando SELECT retorne somente uma linha.
+*/
+--Pegando nome, sobreno e salário do funcionario cujo employee_id = 121.
+SET SERVEROUTPUT ON
+DECLARE
+    vFirst_name   employees.first_name%type;
+    vLast_name    employees.last_name%type;
+    vSalary       employees.salary%type;
+    vEmployee_id  employees.employee_id%type := 121;
+BEGIN
+    SELECT first_name, last_name, salary
+    INTO  vFirst_name, vLast_name, vSalary
+    FROM employees
+    WHERE employee_id = vEmployee_id;
+    DBMS_OUTPUT.PUT_LINE('vEmployee_id: ' || vEmployee_id);
+    DBMS_OUTPUT.PUT_LINE('vFirst_name: ' || vFirst_name);
+    DBMS_OUTPUT.PUT_LINE('vLast_name: ' || vLast_name);
+    DBMS_OUTPUT.PUT_LINE('vSalary: ' || vSalary);
+END;
+
+--Pegando a média e somatório de todos os salarios cujo o cargo é igual a 'IT_PROG'.
+SET SERVEROUTPUT ON
+DECLARE 
+    vJob_id     employees.job_id%type := 'IT_PROG';
+    vAvg_salary employees.salary%type;
+    vSum_salary employees.salary%type;
+BEGIN
+    SELECT ROUND(AVG(salary),2), ROUND(SUM(salary),2)
+    INTO vAvg_salary, vSum_salary
+    FROM employees
+    WHERE job_id = vJob_id;
+    DBMS_OUTPUT.PUT_LINE('Cargo: ' || vJob_id);
+    DBMS_OUTPUT.PUT_LINE('Média de Salários: ' || vAvg_salary);
+    DBMS_OUTPUT.PUT_LINE('Somatória de Salários: ' || vSum_salary);
+END;
+
+
+--Utilizando comando INSERT no PL/SQL
+SET SERVEROUTPUT ON
+DECLARE
+    vFast_name employees.first_name%type;
+    vLast_name employees.last_name%type;
+    vSalary    employees.salary%type;
+BEGIN
+    INSERT INTO employees
+        (employee_id, first_name, last_name, email, phone_number, hire_date, job_id, salary, commission_pct, manager_id, department_id)
+    VALUES
+        (employees_seq.nextval, 'Kobe', 'Bryant', 'KBRYANT', '515.123.45568', SYSDATE,'IT_PROG', 15000, 0.4, 103, 60);
+    COMMIT;
+END;
+
+--Utilizando UPDATE no PL/SQL
+SET SERVEROUTPUT ON
+DECLARE
+    vEmployee_id employees.employee_id%type := 150;
+    vPercentual  NUMBER(3) := 10;
+BEGIN
+    UPDATE employees
+    SET    salary = salary * (1 + vPercentual / 100)
+    WHERE  employee_id = vEmployee_id;
+    COMMIT;
+END;
+
+SELECT * FROM employees WHERE employee_id = 150;
+
+--Utilizando DELETE no PL/SQL
+SET SERVEROUTPUT ON
+DECLARE
+    vEmployee_id employees.employee_id%type := 207;
+BEGIN
+    DELETE FROM employees
+    WHERE employee_id = vEmployee_id;
+    COMMIT;
+END;
+    
+SELECT * FROM employees WHERE employee_id = 207;    
+
+
+-- Transações de Banco de Dados
+/*
+Consisten em :
+- Um conjunto de comandos DML
+- Um comando DLL
+- Um comando DCL
+
+Uma Transação inicia em um dos seguintes eventos:
+- Você se conecta e um comando SQL DML é excutado.
+- Após um comando COMMIT, um comando SQL DML é executado.
+- Após um comando ROLLBACK, um comando SQL DML é executado.
+
+Uma Transação termina em um dos seguintes eventos:
+- Um comando COMMIT.
+- Um comando ROLLBACK.
+- Um comando DDL ou DCL, (executa um commit automático).
+- O usuário encerra a sessão (desconecta), no SLQ Developer, SQL*Plus e etc...
+- Crash do sistema (Sistema operacional, rede, banco de dados, etc...).
+*/
+
+
+
