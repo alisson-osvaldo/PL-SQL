@@ -341,6 +341,32 @@ Uma Transação termina em um dos seguintes eventos:
 - Um comando DDL ou DCL, (executa um commit automático).
 - O usuário encerra a sessão (desconecta), no SLQ Developer, SQL*Plus e etc...
 - Crash do sistema (Sistema operacional, rede, banco de dados, etc...).
+
+COMMIT encerra a transação corrente tornando todas as mudanças pendentes permanentes.
+Unica forma de voltar é fazendo Backoup do BD ou recurso de FlashBack.
+
+ROLLBACK encerra a transação corrente, desfazendo todas as mudanças(INSERT, UPDATE, DELETE, etc...).
+
+SAVEPOINT é uma marca um ponto de controle na sua transação.
+Sintaxe: SAVEPOINT nomesavepoint;
+
+ROLLBACK TO SAVEPOINT nomesavepoint, descarta todas as mudanças realizadas apartir do SAVEPOINT.
+(não é muito recomendado)
+*/
+SAVEPOINT UPDATEOK; -- O ROLLBACK vai contar apartir daqui
+    UPDATE employees
+    SET    salary = 5000
+    WHERE  job_id = 'IT_PROG';
+
+ROLLBACK TO UPDATEOK; -- Esse cara vai dedscartar tudo o que foi feito apartir do SAVEPOINT
+
+
+--- tributos do CURSOR SQL ---
+/*
+- SQL%ROWCOUNT  Número de linhas afetados pelo cursor, ou seja pelo ultimo comando SQL.
+- SQL%FOUND     Retorna true se o cursor afetou uma ou mais linhas.
+- SQL%NOTFOUND  Retorna true se o cursor não afetou nenhuma linha
+- SQL%ISOPEN    Retorna false, porque o Oracle controla o cursor implicito automáticamente, fechando o cursor.
 */
 
 
