@@ -34,6 +34,19 @@ DELIMITADORES:
 -- 	Indicador de comentário de linha única
 ; 	Terminador de extrato
 - 	Operador de subtração ou negação
+AND     Operador lógico AND
+OR      Operador lógico OR
+
+-----------------------------------------------------------------------------------------------------------------------
+Regras de procedência
+1	**
+2	+,-(Sinais)
+3	*,/
+4	+,-,||
+5	=, <, >, <=, >=, <>, !=, ~=, ^=, BETWEEN, IN, IS, NULL, LIKE
+6	AND
+7	NOT
+8	OR
 
 -----------------------------------------------------------------------------------------------------------------------
 Convenções de Nomenclatura

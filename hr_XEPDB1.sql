@@ -370,4 +370,68 @@ ROLLBACK TO UPDATEOK; -- Esse cara vai dedscartar tudo o que foi feito apartir d
 */
 
 
+---------------------------------------------------------------------------------------------------------------------------
+--- Atributos de Controle ---
+
+--Utilizando parênteses para alterar a sobrepor a regra de procedência
+/*
+- Tudo que estiver entre parenteses será resolvido primeiro.
+- Se você aninhar parênteses eles serão resolvidos de dentro para fora.
+*/
+
+--ex:
+SET SERVEROUTPUT ON
+DECLARE
+    vNota1 NUMBER(11,2) := 7.0;
+    vNota2 NUMBER(11,2) := 6.0;
+    vNota3 NUMBER(11,2) := 9.0;
+    vNota4 NUMBER(11,2) := 6.0;
+    vMedia NUMBER(11,2);
+BEGIN
+    vMedia := (vNota1 + vNota2 + vNota3 + vNota4) / 4;
+    DBMS_OUTPUT.PUT_LINE('Média: ' || vMedia);
+END;
+
+--- Utilizando comando IF ---
+SET SERVEROUTPUT ON 
+    ACCEPT pDepartament_id PROMP 'Digite o id do departamento: ' --ACCEPT vai definir uma váriavel, PROMPT vai ixibir a frase e esperar você digitar.
+DECLARE
+    vPercentual     NUMBER(3);
+    vDepartament_id employees.employee_id%type := &pDepartament_id; --Utilizar & para referenciar a veriavel pDepartament_id.
+BEGIN
+    IF vDepartament_id = 80
+    THEN 
+        vPercentual := 10; --Sales
+    ELSE
+        IF vDepartament_id = 20
+        THEN
+            vPercentual := 15; --Marketing
+        ELSE
+            IF vDepartament_id = 60
+            THEN
+                vPercentual := 20; --IT
+            ELSE
+                vPercentual := 5;
+            END IF;
+        END IF;
+    END IF;
+    DBMS_OUTPUT.PUT_LINE('vDepartament_id: ' || vDepartament_id);
+    DBMS_OUTPUT.PUT_LINE('vPercentual : ' || vPercentual);
+    
+END;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
