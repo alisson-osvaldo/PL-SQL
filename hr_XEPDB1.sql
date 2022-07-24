@@ -392,22 +392,23 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Média: ' || vMedia);
 END;
 
---- Utilizando comando IF ---
+
+--- Utilizando comando IF (aninhado)---
 SET SERVEROUTPUT ON 
-    ACCEPT pDepartament_id PROMP 'Digite o id do departamento: ' --ACCEPT vai definir uma váriavel, PROMPT vai ixibir a frase e esperar você digitar.
+    ACCEPT pDepartment_id PROMP 'Digite o id do departamento: ' --ACCEPT vai definir uma váriavel, PROMPT vai ixibir a frase e esperar você digitar.
 DECLARE
     vPercentual     NUMBER(3);
-    vDepartament_id employees.employee_id%type := &pDepartament_id; --Utilizar & para referenciar a veriavel pDepartament_id.
+    vDepartment_id employees.employee_id%type := &pDepartment_id; --Utilizar & para referenciar a veriavel pDepartment_id.
 BEGIN
-    IF vDepartament_id = 80
+    IF vDepartment_id = 80
     THEN 
         vPercentual := 10; --Sales
     ELSE
-        IF vDepartament_id = 20
+        IF vDepartment_id = 20
         THEN
             vPercentual := 15; --Marketing
         ELSE
-            IF vDepartament_id = 60
+            IF vDepartment_id = 60
             THEN
                 vPercentual := 20; --IT
             ELSE
@@ -415,21 +416,122 @@ BEGIN
             END IF;
         END IF;
     END IF;
-    DBMS_OUTPUT.PUT_LINE('vDepartament_id: ' || vDepartament_id);
+    DBMS_OUTPUT.PUT_LINE('vDepartment_id: ' || vDepartment_id);
     DBMS_OUTPUT.PUT_LINE('vPercentual : ' || vPercentual);
+    
+    UPDATE employees
+    SET    salary = salary * (1 + vPercentual / 100)
+    WHERE  department_id = vDepartment_id;   
+    COMMIT;
     
 END;
 
+-- Comando IF com ELSIF
+SET SERVEROUTPUT ON
+    ACCEPT pDepartment_id PROMP 'Digite o id do departamento: '
+DECLARE
+    vDepartment_id employees.employee_id%type := &pDepartment_id;
+    vPercentual NUMBER(3);
+BEGIN
+    IF vDepartment_id = 80
+    THEN
+        vPercentual := 10; --Sales
+    ELSIF vDepartment_id = 20
+    THEN
+        vPercentual := 15; --Marketing
+    ELSIF vDepartment_id = 60
+    THEN
+        vPercentual := 20; --TI
+    ELSE
+        vPercentual := 5;
+    END if;
+    
+    DBMS_OUTPUT.PUT_LINE('Id do Departamento: ' || vDepartment_id);   
+    DBMS_OUTPUT.PUT_LINE('percentual: ' || vPercentual );  
+
+    UPDATE employees 
+    SET    salary = salary * (1 + vPercentual / 100)
+    WHERE department_id =  vDepartment_id;
+    --COMMIT;
+END;
 
 
+--- Utilizando o comando CASE ---
+--Modelo 1
+SET SERVEROUTPUT ON
+    ACCEPT pDepartment_id PROMPT 'Digite o id do departemento:'
+DECLARE
+    vPercentual NUMBER(3);
+    vDepartment_id employees.employee_id%type := &pDepartment_id;
+BEGIN
+    CASE
+    WHEN vDepartment_id = 80
+    THEN
+        vPercentual := 10; --Sales
+    WHEN vDepartment_id = 20
+    THEN
+        vPercentual := 15; --Marketing
+    WHEN vDepartment_id = 60
+    THEN 
+        vPercentual := 20;
+    ELSE
+        vPercentual := 5;
+    END CASE;
+    
+    DBMS_OUTPUT.PUT_LINE('Id do departamento: ' || vDepartment_id);
+    DBMS_OUTPUT.PUT_LINE('Percentual: ' || vPercentual);
+    
+    UPDATE employees
+    SET salary = salary * (1 + vPercentual / 100)
+    WHERE department_id = &PDepartment_id;
+    --COMMIT;
+END;   
+
+--Modelo 2
+SET SERVEROUTPUT ON
+    ACCEPT pDepartment_id PROMPT 'Digite o id do departamento:'
+DECLARE
+    vPercentual    NUMBER(3);
+    vDepartment_id employees.employee_id%type := &pDepartment_id;
+BEGIN
+    CASE vDepartment_id
+    WHEN 80
+    THEN 
+        vPercentual := 10; --Sales
+    WHEN 20
+    THEN
+        vPercentual := 15; --Marketing
+    WHEN 60
+    THEN 
+        vPercentual := 20; --IT
+    ELSE 
+        vPercentual := 5;
+    END CASE;
+    
+    DBMS_OUTPUT.PUT_LINE('Id do departamento: ' || vDepartment_id);
+    DBMS_OUTPUT.PUT_LINE('Percentual: ' || vPercentual);
+    
+    UPDATE employees
+    SET    salary = salary * (1 + vPercentual / 100)
+    WHERE  department_id = &pDepartment_id;
+    --COMMIT;
+END;
 
 
-
-
-
-
-
-
+--- Utilizando LOOP Básico ---
+SET SERVEROUTPUT ON
+    ACCEPT pLimite PROMPT 'Digite o valor do limite: '
+DECLARE
+    vNumero NUMBER(38) := 1;
+    vLimite NUMBER(38) := &pLimite;
+BEGIN
+    --Imprimindo números de 1 até o Limite
+    LOOP 
+        DBMS_OUTPUT.PUT_LINE('Número: ' || TO_CHAR(vNumero));
+        EXIT WHEN vNumero = vLimite;
+        vNumero := vNumero + 1;
+    END LOOP;
+END;
 
 
 
