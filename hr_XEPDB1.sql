@@ -534,6 +534,56 @@ BEGIN
 END;
 
 
+--- Utilizando FOR LOOP ---
+SET SERVEROUTPUT ON
+    ACCEPT pLimite PROMPT 'Digite o limite: '
+DECLARE
+    vInicio NUMBER(3) := 1;
+    vFim    NUMBER(38):= &pLimite;
+BEGIN
+    FOR i IN vInicio..vFim LOOP
+        DBMS_OUTPUT.PUT_LINE('Número: ' || TO_CHAR(i));
+    END LOOP;
+END;
+
+
+--- Utilizando WHILE LOOP ---
+SET SERVEROUTPUT ON
+    ACCEPT pLimite PROMPT 'Digite o limite: '
+DECLARE
+    vNumero NUMBER(38) := 1;
+    vLimite    NUMBER(38) := &pLimite;
+BEGIN
+    WHILE vNumero <= vLimite LOOP
+        DBMS_OUTPUT.PUT_LINE('Número: ' || vNumero);
+        vNumero := vNumero + 1;
+    END LOOP;
+END;
+
+
+--- Controlando LOOPs aninhados ---
+SET SERVEROUTPUT ON
+DECLARE
+    vTotal NUMBER(38) := 1;
+BEGIN
+    <<LOOP1>>
+    FOR i IN 1..8 LOOP
+        DBMS_OUTPUT.PUT_LINE('I: ' || TO_CHAR(i));
+        <<LOOP2>>
+        FOR j IN 1..8 LOOP
+            DBMS_OUTPUT.PUT_LINE('J: ' || TO_CHAR(j));
+            DBMS_OUTPUT.PUT_LINE('Total: ' || TO_CHAR(vTotal, '99G999G999G999G999G999G999G999D99') || Chr(10));
+            vTotal := vTotal * 2;
+            -- EXIT LOOP1 WHEN vtotal > 1677721600; --Condição de saida (Aqui saira diretamente do LOOP1)
+            -- EXIT WHEN vtotal > 1000000000000000; --Aqui saira apenas do Loop corrente no aqui no caso LOOP2
+        END LOOP;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('Total Final: ' || TO_CHAR(vTotal, '99G999G999G999G999G999G999G999D99'));
+END;
+    
+
+
+
 
 
 
