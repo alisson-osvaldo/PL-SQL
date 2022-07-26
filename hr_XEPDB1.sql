@@ -581,6 +581,118 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Total Final: ' || TO_CHAR(vTotal, '99G999G999G999G999G999G999G999D99'));
 END;
     
+/* Exercício
+Imagina um Quadrado com 10 linhas e 10 Colunas
+Imprima todas as combinações possíveis de números de linhas e números de colunas
+Exemplo:
+Linha 1 - Coluna 1
+Linha 1 - Coluna 2
+Linha 1 - Coluna 3 
+... 
+*/
+SET SERVEROUTPUT ON
+DECLARE
+    vLinha  NUMBER(38) := 1;
+    vColuna NUMBER(38) := 1;
+BEGIN
+    <<LOOP1>>
+    FOR i IN 1..10 LOOP
+        <<LOOP2>>
+        FOR j IN 1..10 LOOP
+            DBMS_OUTPUT.PUT_LINE('Linha: ' || i || '   Coluna: ' || j);
+        END LOOP;
+            DBMS_OUTPUT.PUT_LINE(CHR(10));
+    END LOOP;
+END;
+
+
+--- Criando um PL/SQL RECORDS ---
+/*
+É um tipo de variável que pode ser subdividida em campos.
+Exemplo: rua, bairro, cidade, complemento... 
+*/
+--SET VERIFY OFF //Não imprime o bloco dopois da saída, apenas o resultado.
+
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+    ACCEPT pEmployee_id PROMPT 'Digite o id do empregado: '
+DECLARE
+    TYPE employee_record_type IS RECORD
+        (
+            employee_id  employees.employee_id%type,
+            first_name   employees.first_name%type,
+            last_name    employees.last_name%type,
+            email        employees.email%type,
+            phone_number employees.phone_number%type
+        );
+    employee_record employee_record_type; --Declarndo a variável (employee_record) que é do tipo (employee_record_type)
+BEGIN
+    SELECT employee_id, first_name, last_name, email, phone_number
+    INTO   employee_record
+    FROM   employees
+    WHERE  employee_id = &pEmployee_id;
+    
+    DBMS_OUTPUT.PUT_LINE(employee_record.employee_id || ' - ' ||
+                         employee_record.first_name  || ' - ' ||
+                         employee_record.last_name   || ' - ' ||
+                         employee_record.email       || ' - ' ||
+                         employee_record.phone_number);
+END;
+
+-- Criando um PL/SQL Record utilizando atributo %ROWTYPE
+/*
+Exemplo: 
+DECLARE
+employee_record employees%rowtype; 
+
+Defini que a employee_record tem os mesmos campos que a tabela employees.
+*/
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+    ACCEPT pEmployee_id PROMPT 'Digite o id do empregado: '
+DECLARE
+    employee_record    employees%rowtype;
+    vEmployee_id        employees.employee_id%type := &pEmployee_id;
+BEGIN
+    SELECT  *
+    INTO    employee_record
+    FROM    employees
+    WHERE   employee_id = &pEmployee_id;
+    DBMS_OUTPUT.PUT_LINE(
+                            employee_record.employee_id || ' - ' ||
+                            employee_record.first_name  || ' - ' ||
+                            employee_record.last_name   || ' - ' ||
+                            employee_record.job_id      
+                        );
+END;
+
+---------------------------------------------------------------------------------------------------------------------------
+--COLECTIONS
+/*
+-São listas (vetores).
+*/
+
+-- Associative Array
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    TYPE Numero_Table_Type IS TABLE OF NUMBER(2) --IS TABLE OFF : para um "Associative Array"
+    INDEX BY BINARY_INTEGER;
+    Numero_Table    Numero_Table_Type; --Numero_Table é um Associative Array de Numero_Table_Type(2).
+BEGIN
+    FOR i IN 1..10
+    LOOP
+        Numero_Table(i) := i;
+    END LOOP;
+    --Ler e imprimir o Array
+    FOR i IN 1..10
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Associative Array: Indece= ' || TO_CHAR(i) || ', Valor: ' || TO_CHAR(Numero_Table(I)));
+    END LOOP;
+END;
+
+
+
 
 
 
