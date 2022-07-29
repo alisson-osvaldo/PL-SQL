@@ -821,6 +821,26 @@ BEGIN
     END LOOP;
 END;
 
-
-
-
+-- Utilizando Métodos para controlar Collections
+/*
+Métodos         Descrição                                              Tipos de Collections
+ - EXISTS(n)    Retorna TRUE se o elemento (n) exixtir.                Todos
+ - COUNT        Retorna o número de elementos.                         Todos
+ - FIRST        Retorna o primeiro número do indice.                   Todos
+                Retorna NULL se a collection estiver vázia.            
+ - LAST         Retorna o ultimo número do indice.                     Todos
+                Retorna NULL se a collection estiver vázia.
+ - LIMIT        Retorna o limite do indice.                            VARRAY
+ - PRIOR(n)     Retorna o número do indice anterior a (n).             Todos
+ - NEXT(n)      Retorna o número do indice posterior a (n).            Todos
+ - EXTEND(n)    Para aumentar o tamanho:                               Nested Table / VARRAY
+                EXTEND        adiciona um elemento nulo.
+                EXTEND(n)     adiciona (n) elementos nulos.
+                EXTENDO(m, i) adiciona (n) cópias do elemento (i).
+ - TRIM         TRIM Remove um elemento do final da Collection.        Nested Table
+                TRIM(n) Remove (n) elemento do final da Collection.
+ - DELETE       DELETE       Remove os elementos de uma Collection.    Associative Array / Nescted Table
+                DELETE(n)    Remove o elemento (n) da Collection.
+                DELETE(m, n) Remove todos os elementos na faixa m..n 
+                da Collection, incluindo m e n.
+*/
