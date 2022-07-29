@@ -217,6 +217,9 @@ SELECT TO_CHAR(sysdate, 'DD,MM,YYYY') FROM dual;
 --DESC função que mostra a estrutura da tabela.
 DESC employees
 
+--COUNT função que faz uma contagem.
+SELECT COUNT (*) FROM employees;
+
 ------------------------------------------------------------------------------------------------------------------------------------
 -- Escopo de Identificadores e Blocos Aninhados
 
@@ -672,7 +675,10 @@ END;
 -São listas (vetores).
 */
 
--- Associative Array
+-- Associative Array (Mais utilizado)
+/*
+- Indice pode ser negativo, positivo ou 0;
+*/
 SET SERVEROUTPUT ON
 SET VERIFY OFF
 DECLARE
@@ -715,6 +721,105 @@ BEGIN
 END;
 
 
+-- Collections - Nested Table (Segundo mais utilizado).
+/*
+- Posso definir uma coluna em uma tabela do tipo Nestd Table (más não deve ser feito).
+- Pode ser estendido, durante a execução do programa.
+Diretrizes:
+- Precisa ser alocado com o método EXTEND para serem definidos.
+- Indice deve ter valor positivo de 1 até N.
+- Deve ser inicializada.
+- Não inclui a cláusula INDEX BY
+*/
+SET SERVEROUTPUT ON 
+SET VERIFY OFF
+DECLARE
+    TYPE Numero_Table_Type IS TABLE OF INTEGER(2);
+    Numero_Table numero_table_type := numero_table_type();
+BEGIN
+    --Armazenar número de 1 á 10 em um Nested Table
+    FOR i IN 1..10
+    LOOP
+        Numero_Table.Extend; -- Antes de atribuir um valor para ocorrência é obrigado usar o método EXTEND para alocar esse valor para a ocorrência.
+        NUmero_Table(i) := i;
+    END LOOP;
+    -- O programa vai fazer muitas coisas...
+    -- Lê o Nested Table e imprime os números armazenados
+    FOR i IN 1..10
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Nested Table: Index = ' || TO_CHAR(i) || '    Valor: ' || TO_CHAR(Numero_Table(i)));
+    END LOOP;
+END;
+  
+
+-- Nested Table of Records - Bulk Collect
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    TYPE employees_table_type IS TABLE OF employees%rowtype;
+    Employees_Table employees_table_type := employees_table_type();
+BEGIN
+    SELECT *
+        BULK COLLECT INTO Employees_Table
+    FROM employees;
+    FOR i IN Employees_Table.first..Employees_Table.last
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(
+                                Employees_Table(i).employee_id || ' - ' ||
+                                Employees_Table(i).first_name   || ' - ' ||
+                                Employees_Table(i).last_name    || ' - ' ||
+                                TO_CHAR(Employees_Table(i).salary, '99G999G999D99')
+                            );
+    END LOOP;
+END;
+
+
+-- VARRAY (não é muito utilizado)
+/*
+ - Introduzido no Oracle 8.
+ - O tamanho máximo deve ser declarado na declaração do tipo.
+*/
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    TYPE Numero_Table_Type IS VARRAY(10) OF INTEGER(2);
+    Numero_Table Numero_Table_Type := Numero_Table_Type();
+BEGIN
+    --Armazenar número de 1 á 10 em um VARRAY
+    FOR i IN 1..10
+    LOOP
+        Numero_Table.extend;
+        Numero_Table(i) := i;
+    END LOOP;
+    -- O programa vai fazer muitas coisas..
+    -- Imprimir os dados armazenados no VARRAY
+    FOR i IN 1..10
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('VARRAY: Indice= ' || TO_CHAR(i) || '  Valor: ' || Numero_Table(i));
+    END LOOP;
+END;
+
+
+--VARRAY OF RECORDS - BULK COLLECT
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    TYPE Employees_Table_Type IS VARRAY(200) OF employees%rowtype; --Estrutura de bloco da tabela employees
+    Employees_Table Employees_Table_Type := Employees_Table_Type();
+BEGIN
+    SELECT *
+        BULK COLLECT INTO Employees_Table
+    FROM employees;
+    FOR i IN Employees_Table.first..Employees_Table.last
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(
+                               Employees_Table(i).employee_id || ' - ' ||
+                               Employees_Table(i).first_name   || ' - ' ||
+                               Employees_Table(i).last_name    || ' - ' ||
+                               TO_CHAR(Employees_Table(i).salary, '99G999G999D99')
+                            );
+    END LOOP;
+END;
 
 
 
