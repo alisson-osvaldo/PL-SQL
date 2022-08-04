@@ -204,3 +204,140 @@ EXCEPTION
 
 END;
 
+
+-- Exceções Definidas pelo Desenvolvedor 
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+ACCEPT pEmployee_id PROMPT 'Digite o id do empregado: '
+DECLARE
+    vFirst_name     employees.first_name%Type;
+    vLast_name      employees.last_name%Type;
+    vJob_id         employees.job_id%Type;
+    vEmployee_id    employees.employee_id%Type := &pEmployee_id; 
+    ePresident      EXCEPTION;
+BEGIN
+    SELECT  first_name, last_name, job_id
+    INTO    vFirst_name, vLast_name, vJob_id
+    FROM    employees
+    WHERE   employee_id = vEmployee_id;
+
+    IF vJob_id = 'AD_PRES'
+    THEN
+        RAISE ePresident; 
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN 
+        RAISE_APPLICATION_ERROR(-20001, 'Empregado não encontrado id = ' || TO_CHAR(vEmployee_id));
+    WHEN ePresident
+    THEN
+        UPDATE  employees
+        SET     salary = salary * 1.5
+        WHERE   employee_id = vEmployee_id;
+    WHEN OTHERS
+    THEN
+        RAISE_APPLICATION_ERROR( -20002, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+        
+
+-- PRAGMA EXCEPTION INIT
+SET SERVEROUTPUT ON
+DECLARE
+   vemployee_id    employees.employee_id%TYPE := 300;
+   vfirst_name     employees.first_name%TYPE := 'Robert';
+   vlast_name      employees.last_name%TYPE := 'Ford';
+   vjob_id         employees.job_id%TYPE := 'XX_YYYY';
+   vphone_number   employees.phone_number%TYPE := '650.511.9844';
+   vemail          employees.email%TYPE := 'RFORD';
+   efk_inexistente EXCEPTION;
+   PRAGMA EXCEPTION_INIT(efk_inexistente, -2291);
+
+BEGIN
+   INSERT INTO employees (employee_id, first_name, last_name, phone_number, email, hire_date,job_id)
+   VALUES (vemployee_id, vfirst_name, vlast_name, vphone_number, vemail, sysdate, vjob_id);
+EXCEPTION
+   WHEN  efk_inexistente 
+   THEN
+         RAISE_APPLICATION_ERROR(-20003, 'Job inexistente!');
+   WHEN OTHERS 
+   THEN
+         RAISE_APPLICATION_ERROR(-20002, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+-- Forçar o Erro para descobrir o código de Erro a ser tratado
+   INSERT INTO employees (employee_id, first_name, last_name, phone_number, email, hire_date, job_id)
+   VALUES (employees_seq.nextval, 'Joseph', 'Smith', '3333333', 'JSMITH', sysdate, 'ZZZZ_XX');
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+--- PROCEDURE ---
+
+-- Criando uma Procedure de Banco de Dados
+CREATE OR REPLACE PROCEDURE PRC_INSERE_EMPREGADO
+  (pfirst_name    IN VARCHAR2,
+   plast_name     IN VARCHAR2,
+   pemail         IN VARCHAR2,
+   pphone_number  IN VARCHAR2,
+   phire_date     IN DATE DEFAULT SYSDATE, --Se não passar um valor para ele, irá receber a data atual.
+   pjob_id        IN VARCHAR2,
+   pSALARY        IN NUMBER,
+   pCOMMICION_PCT IN NUMBER,
+   pMANAGER_ID    IN NUMBER,
+   pDEPARTMENT_ID IN NUMBER)
+IS 
+  -- Nenhuma variável declarada
+BEGIN
+  INSERT INTO employees (
+    employee_id,
+    first_name,
+    last_name,
+    email,
+    phone_number,
+    hire_date,
+    job_id,
+    salary,
+    commission_pct,
+    manager_id,
+    department_id )
+  VALUES (
+    employees_seq.nextval, --adicionar altomático o próximo id
+    pfirst_name,
+    plast_name,
+    pemail,
+    pphone_number,
+    phire_date,
+    pjob_id,
+    psalary,
+    pcommicion_pct,
+    pmanager_id,
+    pdepartment_id );
+EXCEPTION
+  WHEN OTHERS THEN
+     RAISE_APPLICATION_ERROR(-20001, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+
+-- Executando a Procedure pelo Bloco PL/SQL
+BEGIN
+  PRC_INSERE_EMPREGADO('David', 'Bowie','DBOWIE','515.127.4861',SYSDATE,'IT_PROG',15000,NULL,103,60);
+  COMMIT;
+END;
+
+-- Consultando o empregado inserido
+SELECT *
+FROM   employees
+WHERE  first_name = 'David' AND
+       last_name = 'Bowie';
+
+-- Executando a Procedure com o comando EXECUTE do SQL*PLUS
+EXEC PRC_INSERE_EMPREGADO('Greg', 'Lake','GLAKE','515.127.4961',SYSDATE,'IT_PROG',15000,NULL,103,60)
+COMMIT;
+
+-- Consultando o empregado inserido
+SELECT *
+FROM   employees
+WHERE  first_name = 'Greg' AND
+       last_name = 'Lake';
+
+
+
+
