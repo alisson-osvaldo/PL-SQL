@@ -636,3 +636,93 @@ DROP FUNCTION FNC_CONSULTA_TITULO_CARGO_EMPREGADO;
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -- Gerenciando PROCEDURES e FUNCTIONS
+
+--Consultando Objetos tipo PROCEDURE e FUNCTION do seu usuário - prática
+
+DESC USER_OBJECTS --informações dos objetos do usuário em que está conectado ex: user hr
+
+-- Consulta todas as PROCEDURES e FUNÇÔES
+SELECT object_name, object_type, last_ddl_time, timestamp, status
+FROM   user_objects
+WHERE  object_type IN ('PROCEDURE', 'FUNCTION');
+
+-- Consulta todos os Objetos até mesmo os que o Oracle criou (objetos q seu usuário tem privilégio)
+SELECT object_name, object_type, last_ddl_time, timestamp, status
+FROM   all_objects
+WHERE  object_type IN ('PROCEDURE', 'FUNCTION');
+
+-- Consultando objetos Inválidos do schema do seu usuário 
+SELECT object_name, object_type, last_ddl_time, timestamp, status
+FROM   user_objects
+WHERE  status = 'INVALID';
+
+-- Consultando o Código Fonte de Procedures e Fuções do seu usuário
+DESC user_source --Se eu quero consultar o código fonte de um objeto uso a visão user_source
+
+--Consultando Código Fonte da PROCEDURE
+SELECT line, text
+FROM   user_source
+WHERE  name = 'PRC_INSERE_EMPREGADO' AND
+       type = 'PROCEDURE'
+
+ORDER BY line;
+
+--Consultando Código Fonte da FUNCTION
+SELECT line, text
+FROM   user_source
+WHERE  name = 'FNC_CONSULTA_SALARIO_EMPREGADO' AND
+       type = 'FUNCTION'
+ORDER BY line;
+
+-- Consultando a lista de parâmetros de Procedures e Funções 
+DESC PRC_INSERE_EMPREGADO
+
+DESC FNC_CONSULTA_SALARIO_EMPREGADO
+
+-- Consultando Erros de Compilação
+/*
+- SHOW ERRORS PROCEDURE nome_procedure
+- SHOW ERRORS FUNTION   nome_function
+- SHOW ERRORS PACKAGE   nome_package
+
+* USER_ERRORS tem os erros do objetos do esquema do usuário em que está conectado.
+* ALL_ERRORS  tem os erros do objetos do esquema do usuário em que está conectado e em que ele tem privilégio.
+* DBA_ERRORS  tem os erros de todo o banco de dados, más pode ser acessado apenas pelo DBA.
+*/
+
+-- Forçando um erro de compilação
+CREATE OR REPLACE FUNCTION FNC_CONSULTA_SALARIO_EMPREGADO
+  (pemployee_id   IN NUMBER)
+   RETURN NUMBER
+IS 
+  vsalary  employees.salary%TYPE;
+BEGIN
+  SELECT salary
+  INTO   vsalary
+  FROM   employees
+  WHERE employee_id = pemployee_id --Sem o ; aqui
+  RETURN (vsalary);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN 
+      RAISE_APPLICATION_ERROR(-20001, 'Empregado inexistente');
+  WHEN OTHERS THEN
+     RAISE_APPLICATION_ERROR(-20002, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+
+-- Consultando Erros de Compilação - Comando SHOW ERRORS
+SHOW ERRORS FUNCTION  FNC_CONSULTA_SALARIO_EMPREGADO
+SHOW ERRORS PROCEDURE FNC_CONSULTA_SALARIO_EMPREGADO
+
+-- Consultando Erros de Compilação - Visão USER_ERRORS
+DESC user_errors
+
+COLUMN position FORMAT a4 --Formatando a coluna
+COLUMN text FORMAT a60    --Formatando a coluna
+SELECT line||'/'||position position, text
+FROM   user_errors
+WHERE  name = 'FNC_CONSULTA_SALARIO_EMPREGADO'
+ORDER BY line;
+
+--Consultando ERRO de compilação com o comando SHOW_ERRORS (só vai precisar se estiver compilando pelo SQL PLUS)
+SHOW ERRORS PROCEDURE FNC_CONSULTA_SALARIO_EMPREGADO;
+
