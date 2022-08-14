@@ -272,6 +272,12 @@ END;
 ------------------------------------------------------------------------------------------------------------------------------------
 --- PROCEDURE ---
 
+--Comandos:
+ALTER PROCEDURE PRC_CONSULTA_EMPREGADO COMPILE; --utilizado quando vc acha que seu código está ok, e quer recomplilar.
+
+DROP PROCEDURE PRC_CONSULTA_EMPREGADO; --Deletar Procedure (pós deletar já era, só fazendo backup do BD)
+
+
 -- Criando uma Procedure de Banco de Dados
 CREATE OR REPLACE PROCEDURE PRC_INSERE_EMPREGADO
   (pfirst_name    IN VARCHAR2,
@@ -340,7 +346,7 @@ WHERE  first_name = 'Greg' AND
 
 
 
--- Utilizando Parametros tipo IN
+-- Utilizando Parametros tipo IN --------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE PRC_AUMENTA_SALARIO_EMPREGADO 
     (
         pemployee_id IN NUMBER,
@@ -367,21 +373,266 @@ END;
 
 
 
+-- Utilizando Parametros tipo OUT ----------------------------------------------------------
+CREATE OR REPLACE PROCEDURE PRC_CONSULTA_EMPREGADO
+    (pemployee_id   IN  NUMBER,
+     pfirst_name     OUT VARCHAR2,
+     plast_name      OUT VARCHAR2,
+     pemail         OUT VARCHAR2,
+     pphone_number   OUT VARCHAR2,
+     phire_date      OUT DATE,
+     pjob_Id        OUT VARCHAR2,
+     psalary        OUT NUMBER,
+     pCommission_Pct OUT NUMBER,
+     pManager_Id     OUT NUMBER,
+     pDepartment_Id  OUT NUMBER)
+IS
+    --Nenhuma váriavel de clarada
+BEGIN 
+    SELECT
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        hire_date,
+        job_id,
+        salary,
+        commission_pct,
+        manager_id,
+        department_id
+    INTO
+        pfirst_name,
+        plast_name,
+        pemail,
+        pphone_number,
+        phire_date,
+        pjob_id,
+        psalary,
+        pcommission_pct,
+        pmanager_id,
+        pdepartment_id
+
+    FROM employees
+    WHERE employee_id = pemployee_id;
+    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APpLICATION_ERROR(-20001, 'Empregado NÃ£o existe: ' || pemployee_id);
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+
+-- Executando procedure parametro Tipo OUT
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE 
+    employees_record employees%ROWTYPE;
+BEGIN   
+    PRC_CONSULTA_EMPREGADO(100, employees_record.first_name, employees_record.last_name, employees_record.email,
+        employees_record.phone_number, employees_record.hire_date, employees_record.job_id, employees_record.salary,
+        employees_record.commission_pct, employees_record.manager_id, employees_record.department_id);
+        DBMS_OUTPUT.PUT_LINE(employees_record.first_name || ' ' || 
+                         employees_record.last_name || ' - ' ||
+                         employees_record.department_id || ' - ' ||
+                         employees_record.job_id || ' - ' ||
+                         employees_record.phone_number || ' - ' ||
+                         LTRIM(TO_CHAR(employees_record.salary, 'L99G999G999D99')));
+END;
+    
+-- Utilizando Parametros tipo OUT com opção NOCOPY
+CREATE OR REPLACE PROCEDURE PRC_CONSULTA_EMPREGADO
+  (pemployee_id   IN NUMBER,
+   pfirst_name    OUT NOCOPY VARCHAR2, --OUT NOCOPY em vez de copíar ele vai fazer referência  
+   plast_name     OUT NOCOPY VARCHAR2,
+   pemail         OUT NOCOPY VARCHAR2,
+   pphone_number  OUT NOCOPY VARCHAR2,
+   phire_date     OUT NOCOPY DATE,
+   pjob_id        OUT NOCOPY VARCHAR2,
+   pSALARY        OUT NOCOPY NUMBER,
+   pCOMMISSION_PCT OUT NOCOPY NUMBER,
+   pMANAGER_ID    OUT NOCOPY NUMBER,
+   pDEPARTMENT_ID OUT NOCOPY NUMBER)
+IS 
+BEGIN
+  SELECT
+    first_name,
+    last_name,
+    email,
+    phone_number,
+    hire_date,
+    job_id,
+    salary,
+    commission_pct,
+    manager_id,
+    department_id
+  INTO 
+    pfirst_name,
+    plast_name,
+    pemail,
+    pphone_number,
+    phire_date,
+    pjob_id,
+    psalary,
+    pcommission_pct,
+    pmanager_id,
+    pdepartment_id
+  FROM employees
+  WHERE employee_id = pemployee_id;
+  
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+     RAISE_APPLICATION_ERROR(-20001, 'Empregado NÃ£o existe: ' || pemployee_id);
+  WHEN OTHERS THEN
+     RAISE_APPLICATION_ERROR(-20002, 'Erro Oracle ' || SQLCODE || SQLERRM);
+END;
+
+-- Executando procedure parametro Tipo OUT
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    employees_record    employees%ROWTYPE;
+BEGIN
+  PRC_CONSULTA_EMPREGADO(100, employees_record.first_name, employees_record.last_name, employees_record.email,
+    employees_record.phone_number, employees_record.hire_date, employees_record.job_id, employees_record.salary, 
+    employees_record.commission_pct, employees_record.manager_id, employees_record.department_id);
+    DBMS_OUTPUT.PUT_LINE(employees_record.first_name || ' ' || 
+                         employees_record.last_name || ' - ' ||
+                         employees_record.department_id || ' - ' ||
+                         employees_record.job_id || ' - ' ||
+                         employees_record.phone_number || ' - ' ||
+                         LTRIM(TO_CHAR(employees_record.salary, 'L99G999G999D99')));
+END;
+
+
+-- Método Nomeado
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+DECLARE
+    VEMPLOYEE_ID    NUMBER := 100;
+    VFIRST_NAME     VARCHAR2(200);
+    VLAST_NAME      VARCHAR2(200);
+    VEMAIL          VARCHAR2(200);
+    VPHONE_NUMBER   VARCHAR2(200);
+    VHIRE_DATE      DATE;
+    VJOB_ID         VARCHAR2(200);
+    VSALARY         NUMBER;
+    VCOMMISSION_PCT NUMBER;
+    VMANAGER_ID     NUMBER;
+    VDEPARTMENT_ID  NUMBER;
+BEGIN
+    PRC_CONSULTA_EMPREGADO(
+        PEMPLOYEE_ID     => VEMPLOYEE_ID,  --PEMPLOYEE_ID   parâmetro OUT que vai receber o valor de   VEMPLOYEE_ID
+        PFIRST_NAME      => VFIRST_NAME,
+        PLAST_NAME       => VLAST_NAME,
+        PEMAIL           => VEMAIL,
+        PPHONE_NUMBER    => VPHONE_NUMBER,
+        PHIRE_DATE       => VHIRE_DATE,
+        PJOB_ID          => VJOB_ID,
+        PSALARY          => VSALARY,
+        PCOMMISSION_PCT  => VCOMMISSION_PCT,
+        PMANAGER_ID      => VMANAGER_ID,
+        PDEPARTMENT_ID   => VDEPARTMENT_ID
+    );
+    DBMS_OUTPUT.PUT_LINE('PFIRST_NAME     = ' || VFIRST_NAME);
+    DBMS_OUTPUT.PUT_LINE('PLAST_NAME      = ' || VLAST_NAME);
+    DBMS_OUTPUT.PUT_LINE('PEMAIL          = ' || VEMAIL);
+    DBMS_OUTPUT.PUT_LINE('PPHONE_NUMBER   = ' || VPHONE_NUMBER);
+    DBMS_OUTPUT.PUT_LINE('PHIRE_DATE      = ' || VHIRE_DATE);
+    DBMS_OUTPUT.PUT_LINE('PJOB_ID         = ' || VJOB_ID);
+    DBMS_OUTPUT.PUT_LINE('PSALARY         = ' || VSALARY);
+    DBMS_OUTPUT.PUT_LINE('PCOMMISSION_PCT = ' || VCOMMISSION_PCT);
+    DBMS_OUTPUT.PUT_LINE('PMANAGER_ID     = ' || VMANAGER_ID);
+    DBMS_OUTPUT.PUT_LINE('PDEPARTMENT_ID  = ' || VDEPARTMENT_ID);
+END;
 
 
 
+--------------------------------------------------------------------------------------------------------------
+--CRIANDO FUNÇÕES DE BANCO DE DADOS
+
+/*
+- Um função é uma sub-rotina que sempre retorna um valor.
+- Utilize uma FUNÇÂO ao invez de um PROCEDURE quando a rotina retorna obrigatóriamente um valor.
+- Se a rotina retornar nenhum ou mais de um valor, considere o uso de uma PROCEDURE. 
+*/
+
+CREATE OR REPLACE FUNCTION  FNC_CONSULTA_SALARIO_EMPREGADO(pemployee_id IN NUMBER)
+    RETURN NUMBER
+IS 
+    vSalary employees.salary%TYPE;
+BEGIN
+    SELECT salary
+    INTO   vSalary
+    FROM   employees
+    WHERE  employee_id = pemployee_id;
+    RETURN (vSalary);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Empregado inexistente');
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-2002, 'ERRO Oracle ' || SQLCODE || ' - ' || SQLERRM);
+END;
+
+--Executando a Função pelo bloco PL/SQL
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+ACCEPT pEmployee_id PROMPT 'Digite o Id do empregado: '
+DECLARE
+    vEmployee_id    employees.employee_id%TYPE := &pEmployee_id;
+    vSalary         employees.salary%TYPE;
+BEGIN
+    vSalary := FNC_CONSULTA_SALARIO_EMPREGADO(VEmployee_id);
+    DBMS_OUTPUT.PUT_LINE('Salario: ' || vSalary);
+END;
 
 
 
+/*
+    Regras para o uso de funções em comandos SQL
+    * As funções devem ser armazenadas no servidor de Banco De Dados.
+    * A função deve ser do tipo SINGLE-ROW.
+    * No corpo da função, não devem ter comandos DML.
+    * A função deve ter apenas parâmetros do tipo IN.
+    * Tipo PL/SQL, tais como BOOLEAN, RECORD, ou TABLE (array associative), não são aceitos como o tipo de retorno da função.
+    * No corpo da função, não são permitidas chamadas sub-rotinas que desobedeçam quaisquer restrições anteriores. 
+*/
+
+-- Utilizando Funçôes em comandos SQL
+CREATE OR REPLACE FUNCTION FNC_CONSULTA_TITULO_CARGO_EMPREGADO(pJob_id  IN jobs.job_title%TYPE)
+    RETURN VARCHAR2
+IS
+    vJob_title  jobs.job_title%Type;
+BEGIN
+    SELECT  job_title
+    INTO    vJob_title
+    FROM    jobs
+    WHERE   job_id = pJob_id;
+    RETURN  (vJob_title);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20001, 'job inexistente');
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Erro Oracle' || SQLCODE || ' - ' || SQLERRM);
+END;
+
+-- Exemplo Utilizando Funções em comandos SQL (mais correto aqui seria utilizar um join, aqui apenas para exemplo)
+SELECT employee_id, first_name, last_name, job_id, FNC_CONSULTA_TITULO_CARGO_EMPREGADO(job_id) "JOB TITLE"
+FROM employees;
+
+--Mesma consulta mas para penas uma consulta
+SELECT FNC_CONSULTA_TITULO_CARGO_EMPREGADO('IT_PROG')
+FROM   dual; --dual tabela que retorna penas uma linhas.
+
+-- Mesma consulta mas para apenas empregado job_id 130
+SELECT FNC_CONSULTA_SALARIO_EMPREGADO(130)
+FROM   dual;
+
+--Comando para Recompilar função 
+ALTER FUNCTION FNC_CONSULTA_TITULO_CARGO_EMPREGADO COMPILE;
+
+--Comando para Remover uma função do BD (Removeu já erá, apenas backup para restaurar)
+DROP FUNCTION FNC_CONSULTA_TITULO_CARGO_EMPREGADO;
 
 
-
-
-
-
-
-
-
-
-
-
+----------------------------------------------------------------------------------------------------------------------------------
+-- Gerenciando PROCEDURES e FUNCTIONS
