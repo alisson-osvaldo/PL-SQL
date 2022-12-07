@@ -137,13 +137,76 @@ END;
 
 ---------------------------------------------------------------------------------------------------------------------------
 
+-- Packages
+
+/*
+Componentes de uma package:
+- Variável
+- Constante
+- Cursor
+- Exceções
+- Procedures
+- Funções
+
+* Componentes Publicas de uma Package:
+- Componentes (ou construções) publicos de uma package são aqueles qdue podem ser referenciados por externamente a package.
+- Devem ser dedclarados no Package Specification e definidos no Package Body.
+
+* Componentes Privados de uma Package:
+- Componentes privados de uma package são aqueles que podem ser referenciados somente por componentes da própria package.
+- Devem ser declarados e definidos no Package Body.
+*/
 
 
+--Criando o package specification
+/*
+    CREATE [OR REPLACE] PACKAGE nome_package IS|AS
+        -- Declaração de variáveis públicas
+        -- Declaração de constantes públicas
+        -- Declaração de cursores públicas
+        -- Declaração de exceções públicas
+        -- Declaração de procedures públicas
+        -- Declaração de funções públicas
+    END [nome_package];
+*/
 
+--Variável Global
+/*
+ - Quando vc declara uma variável no package specification, vc está declarando uma variável global.
+ - Uma variável global tera valor durante toda a sessão do Oracle, a sessão começa quando se conecta no BD Oracle e 
+   encerra quando se desconecta.
+*/
 
+-- Criando o Package Specification 
+create or replace PACKAGE PCK_EMPREGADOS
+IS
 
+	gMinSalary     employees.salary%TYPE;
+    
+    --Incluindo procedure insere_empregado
+	PROCEDURE PRC_INSERE_EMPREGADO
+	(pfirst_name    IN VARCHAR2,
+	plast_name     IN VARCHAR2,
+	pemail         IN VARCHAR2,
+	pphone_number  IN VARCHAR2,
+	phire_date     IN DATE DEFAULT SYSDATE,
+	pjob_id        IN VARCHAR2,
+	pSALARY        IN NUMBER,
+	pCOMMICION_PCT IN NUMBER,
+	pMANAGER_ID    IN NUMBER,
+	pDEPARTMENT_ID IN NUMBER);
+    
+    --Incluindo procedure aumenta_salario_empregado
+	PROCEDURE PRC_AUMENTA_SALARIO_EMPREGADO
+	(pemployee_id   IN NUMBER,
+	ppercentual    IN NUMBER);
 
+    --Incluindo function consulta salario empregado
+	FUNCTION FNC_CONSULTA_SALARIO_EMPREGADO
+	(pemployee_id   IN NUMBER)
+	RETURN NUMBER;
 
+END PCK_EMPREGADOS;
 
 
 
