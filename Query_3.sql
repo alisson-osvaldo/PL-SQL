@@ -340,7 +340,12 @@ END;
 
 
 
-
+---Procedimento de uma unica execução na Sessão
+/*
+ - Defina um bloco (procedimento) para ser executado uma única vez na sessão, somente na primeira vez que um componente
+   da package for referênciado na sessão do banco de dados.
+ - Este procedimento pode ser utilizado para inicialização a niível de sessão.
+*/
 
 
 
