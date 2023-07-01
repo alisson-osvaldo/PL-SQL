@@ -63,3 +63,61 @@ END;
 
 select * from PRODUTO_EXERCICIO;
 
+
+--- Vários comandos em bloco ---------------------------------------------------------------
+
+DECLARE 
+    v_ID segmercado.ID%type := 3;
+    v_DESCRICAO segmercado.descricao%type := 'Atacadista';
+BEGIN
+    UPDATE segmercado SET descricao = UPPER(v_DESCRICAO) WHERE ID = v_ID;
+    
+    v_ID := 1;
+    v_DESCRICAO := 'Varejista';
+    UPDATE segmercado SET DESCRICAO = UPPER(v_DESCRICAO) WHERE ID = v_ID;
+   
+    v_ID := 2;
+    v_DESCRICAO := 'Industrial';
+    UPDATE segmercado SET DESCRICAO = UPPER(v_DESCRICAO) WHERE ID = v_ID;
+
+    COMMIT;
+END;
+    
+select * from segmercado;
+
+
+--- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
