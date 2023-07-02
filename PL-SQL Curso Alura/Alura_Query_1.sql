@@ -86,12 +86,25 @@ END;
 select * from segmercado;
 
 
---- 
+--- PROCEDURE -----------------------------------------------------------------------------
+--Criando uma procedure para inserir na tabela SEGMERCADO
+CREATE PROCEDURE incluir_segmercado
+(p_ID IN NUMBER, p_DESCRICAO IN VARCHAR2)
+IS
+BEGIN
+    INSERT INTO SEGMERCADO (ID, DESCRICAO) VALUES (p_ID, UPPER(p_DESCRICAO));
+    COMMIT;
+END;
 
+--Executando a procedure
+EXECUTE incluir_segmercado(4, 'Farmaceuticos');
 
+--Executando apenas pelo nome, obs. tem que utilizar begin
+BEGIN
+    incluir_segmercado(5, 'Teste');
+END;
 
-
-
+---
 
 
 
