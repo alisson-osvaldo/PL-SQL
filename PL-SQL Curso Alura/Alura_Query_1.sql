@@ -87,8 +87,10 @@ select * from segmercado;
 
 
 --- PROCEDURE -----------------------------------------------------------------------------
---Criando uma procedure para inserir na tabela SEGMERCADO
-CREATE PROCEDURE incluir_segmercado
+-- Criando uma procedure para inserir na tabela SEGMERCADO
+-- Obs. CREATE OR REPLACE = caso a procedure já exista só irá alterar e não vai criar outra.
+
+CREATE OR REPLACE PROCEDURE incluir_segmercado
 (p_ID IN NUMBER, p_DESCRICAO IN VARCHAR2)
 IS
 BEGIN
@@ -104,14 +106,38 @@ BEGIN
     incluir_segmercado(5, 'Teste');
 END;
 
----
+
+-- EXCLUIR PROCEDURE
+DROP PROCEDURE incluir_segmercado2;
 
 
+-- Retornando o descritor do segmento de mercado
+SET SERVEROUTPUT ON;
+DECLARE
+    v_ID SEGMERCADO.ID%type := 3;
+    v_DESCRICAO SEGMERCADO.DESCRICAO%type;
+BEGIN
+    SELECT DESCRICAO INTO v_DESCRICAO FROM SEGMERCADO WHERE ID = v_ID;
+    dbms_output.put_line(v_DESCRICAO);
+END;
 
 
+--- FUNÇÂO ----------------------------------------------------------------------------
+-- Criando uma função:
+CREATE OR REPLACE FUNCTION obter_descricao_segmercado
+(p_ID IN SEGMERCADO.ID%type)
+RETURN SEGMERCADO.DESCRICAO%type
+IS
+    v_DESCRICAO SEGMERCADO.DESCRICAO%type;
+BEGIN
+    SELECT DESCRICAO INTO v_DESCRICAO FROM SEGMERCADO WHERE ID = p_ID;
+    RETURN v_DESCRICAO;
+END;
 
-
-
+--Utilizando a função:
+SELECT ID, obter_descricao_segmercado(ID), DESCRICAO, LOWER(DESCRICAO) FROM SEGMERCADO WHERE ID = 1;
+SELECT ID, obter_descricao_segmercado(ID), DESCRICAO, LOWER(DESCRICAO) FROM SEGMERCADO;
+select obter_descricao_segmercado(2) from dual;
 
 
 
