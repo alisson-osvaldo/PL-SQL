@@ -134,13 +134,25 @@ BEGIN
     RETURN v_DESCRICAO;
 END;
 
---Utilizando a função:
+--Executando a função:
 SELECT ID, obter_descricao_segmercado(ID), DESCRICAO, LOWER(DESCRICAO) FROM SEGMERCADO WHERE ID = 1;
 SELECT ID, obter_descricao_segmercado(ID), DESCRICAO, LOWER(DESCRICAO) FROM SEGMERCADO;
 select obter_descricao_segmercado(2) from dual;
 
+--Executando fora de um comando PLSQL
+VARIABLE g_DESCRICAO VARCHAR2(100);
+EXECUTE :g_DESCRICAO:=obter_descricao_segmercado(3);
+PRINT g_DESCRICAO;
 
-
+--Executando dentro do PLSQL
+SET SERVEROUTPUT ON;
+DECLARE
+    v_DESCRICAO SEGMERCADO.DESCRICAO%type;
+    v_ID SEGMERCADO.ID%type := 1;
+BEGIN
+    v_DESCRICAO := obter_descricao_segmercado(v_ID);
+    dbms_output.put_line('A descrição do segmento de mercado é ' || v_DESCRICAO);
+END;
 
 
 
