@@ -122,6 +122,60 @@ BEGIN
 END;
 
 
+-- Incluir cliente na tabela de clientes
+CREATE OR REPLACE PROCEDURE incluir_cliente
+(
+p_ID CLIENTE.ID%type,
+p_RAZAO CLIENTE.RAZAO_SOCIAL%type,
+p_CNPJ CLIENTE.CNPJ%type,
+p_SEGMERCADO CLIENTE.SEGMERCADO_ID%type,
+p_FATURAMENTO CLIENTE.FATURAMENTO_PREVISTO%type,
+p_CATEGORIA CLIENTE.CATEGORIA%type
+)
+IS
+BEGIN
+    INSERT INTO CLIENTE
+    VALUES
+    (p_ID, p_RAZAO, p_CNPJ, p_SEGMERCADO, SYSDATE, p_FATURAMENTO, p_CATEGORIA);
+    COMMIT;
+END;
+
+--Chamando a procedure incluir_cliente:
+EXECUTE incluir_cliente (1, 'SUPERMERCADOS CAMPEAO', '1234567890', 1, 90000, 'MEDIO GRANDE');
+
+select * from cliente;
+
+
+
+-- Obter Categoria
+SET SERVEROUTPUT ON
+DECLARE
+    v_FATURAMENTO CLIENTE.FATURAMENTO_PREVISTO%type := 65000;
+    v_CATEGORIA CLIENTE.CATEGORIA%type;
+BEGIN
+    IF v_FATURAMENTO <= 10000 THEN
+        v_CATEGORIA := 'PEQUENO';
+    ELSIF v_FATURAMENTO <= 50000 THEN
+        v_CATEGORIA := 'MÉDIO';
+    ELSIF v_FATURAMENTO <= 100000 THEN
+        v_CATEGORIA := 'MÉDIO GRANDE';
+    ELSE
+        v_CATEGORIA := 'GRANDE';
+    END IF;
+    dbms_output.put_line('A Categoria é ' || v_CATEGORIA);
+END;
+
+
+
+
+
+
+
+
+
+
+
+
 --- FUNÇÂO ----------------------------------------------------------------------------
 -- Criando uma função:
 CREATE OR REPLACE FUNCTION obter_descricao_segmercado
@@ -155,11 +209,51 @@ BEGIN
 END;
 
 
+-- Criando Função para verificar qual a categoria do cliente:
+CREATE OR REPLACE FUNCTION categoria_cliente
+(p_FATURAMENTO IN CLIENTE.FATURAMENTO_PREVISTO%type) 
+RETURN CLIENTE.CATEGORIA%type
+IS
+    v_CATEGORIA CLIENTE.CATEGORIA%type;
+BEGIN
+    IF p_FATURAMENTO <= 10000 THEN
+        v_CATEGORIA := 'PEQUENO';
+    ELSIF p_FATURAMENTO <= 50000 THEN
+        v_CATEGORIA := 'MÉDIO';
+    ELSIF p_FATURAMENTO <= 100000 THEN
+        v_CATEGORIA := 'MÉDIO GRANDE';
+    ELSE
+        v_CATEGORIA := 'GRANDE';
+    END IF;
+    RETURN v_CATEGORIA;
+END;
 
 
+-- Criando procedure para incluir cliente:
+CREATE OR REPLACE PROCEDURE incluir_cliente
+(
+p_ID CLIENTE.ID%type,
+p_RAZAO CLIENTE.RAZAO_SOCIAL%type,
+p_CNPJ CLIENTE.CNPJ%type,
+p_SEGMERCADO CLIENTE.SEGMERCADO_ID%type,
+p_FATURAMENTO CLIENTE.FATURAMENTO_PREVISTO%type
+)
+IS
+    v_CATEGORIA CLIENTE.CATEGORIA%type;
+BEGIN
+
+    v_CATEGORIA := categoria_cliente(p_FATURAMENTO);
+
+    INSERT INTO CLIENTE
+    VALUES
+    (p_ID, p_RAZAO, p_CNPJ, p_SEGMERCADO, SYSDATE, p_FATURAMENTO, v_CATEGORIA);
+    COMMIT;
+END;
 
 
-
+--Executando a procedure incluir_cliente:
+EXECUTE incluir_cliente(3, 'SUPERMERCADO CARIOCA', '2222222222', 1, 30000);
+select * from cliente;
 
 
 
